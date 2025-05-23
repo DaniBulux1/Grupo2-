@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 import { firebaseConfig } from './firebase-config.js';
 
 const app = initializeApp(firebaseConfig);
@@ -8,8 +8,8 @@ const provider = new GoogleAuthProvider();
 
 function signInWithGoogle() {
     signInWithPopup(auth, provider)
-    .then((result) => {
-      const user = result.user;
+    .then(() => {
+      //const user = result.user;
       window.location.href = "index.html";
     })
     .catch((error) => {
@@ -17,4 +17,30 @@ function signInWithGoogle() {
     });
 }
 
-document.getElementById("btn-google").addEventListener("click", signInWithGoogle);
+function logOut() {
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+}
+
+const btnLogIn = document.getElementById("btn-google");
+if (btnLogIn) {
+  btnLogIn.addEventListener("click", signInWithGoogle);
+}
+
+const btnLogOut = document.getElementById("btn-logOut");
+if (btnLogOut) {
+  btnLogOut.addEventListener("click", logOut);
+}
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        const displayName = user.displayName;
+        const email = user.email;
+        const photoURL = user.photoURL;
+
+        document.getElementById("user-name").textContent = displayName;
+        document.getElementById("user-email").textContent = email;
+        document.getElementById("user-photo").src = photoURL;
+    }
+});
